@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="__STATIC__/plugins/layui/css/layui.css">
+</head>
+<body style="padding: 10px">
+<form class="layui-form">
+    <input type="hidden" name="id" value="{$flinkInfo.id}">
+    <div class="layui-form-item">
+        <label class="layui-form-label">网址名称</label>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" name="name" value="{$flinkInfo.name}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">链接</label>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" name="url" value="{$flinkInfo.url}">
+        </div>
+    </div>
+</form>
+<div class="layui-form-item">
+    <div class="layui-input-block">
+        <button class="layui-btn" onclick="save()">保存</button>
+    </div>
+</div>
+<script src="__STATIC__/plugins/layui/layui.js"></script>
+<script>
+    layui.use(['form', 'layer'], function () {
+        form = layui.form;
+        layer = layui.layer;
+        $ = layui.jquery;
+    });
+
+    function save() {
+        var name =$.trim($('input[name="name"]').val());
+        if(name===''){
+            layer.msg('请输入网址名称',{icon:2});
+            return;
+        }
+        $.post("{:url('flink/save')}", $('form').serialize(), function (res) {
+            if(res.code>0){
+                layer.msg(res.msg,{icon:2});
+            }else {
+                layer.msg(res.msg,{icon:1});
+                setTimeout(function (){parent.window.location.reload();},1000);
+            }
+        }, 'json');
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>友情连接</title>
+    <link rel="stylesheet" type="text/css" href="__STATIC__/plugins/layui/css/layui.css">
+    <style>
+        .header span {
+            background-color: #009688;
+            margin-left: 30px;
+            padding: 10px;
+            color: #ffffff;
+        }
+
+        .header div {
+            border-bottom: solid 2px #009688;
+            margin-top: 8px;
+        }
+        .header button {
+            float: right;
+            margin-top: -5px;
+        }
+    </style>
+</head>
+<body style="padding: 10px">
+<div class="header" style="padding: 10px">
+    <span>友情链接</span>
+    <button class="layui-btn layui-btn-sm" onclick="add()">添加</button>
+    <div></div>
+</div>
+<table class="layui-table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>网址名称</th>
+            <th>网址</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+    {volist name='flinkData' id='value'}
+        <tr>
+            <td>{$value.id}</td>
+            <td>{$value.name}</td>
+            <td>{$value.url}</td>
+            <td>
+                <button class="layui-btn layui-btn-xs" onclick="edit({$value.id})">编辑</button>
+                <button class="layui-btn layui-btn-xs layui-btn-danger" onclick="del(this)" fId="{$value.id}">删除</button>
+            </td>
+        </tr>
+    {/volist}
+    </tbody>
+</table>
+<script src="__STATIC__/plugins/layui/layui.js"></script>
+<script>
+    layui.use('layer',function (){
+        layer=layui.layer;
+        $=layui.jquery;
+    });
+    //添加
+    function add() {
+        layer.open({
+            type: 2,
+            title: '添加链接',
+            shade: 0.3,
+            maxmin: true,
+            area: ['480px', '420px'],
+            content: "{:url('flink/add')}" //iframe的url
+        });
+    }
+    function edit(fid){
+        layer.open({
+            type:2,
+            title:'编辑链接',
+            shade:0.3,
+            maxmin: true,
+            area:['480px','420px'],
+            content:'/public/admin/flink/edit?fid='+fid
+        });
+    }
+    function del(obj){
+        var fId=$(obj).attr('fId');
+        layer.confirm('确定要删除吗？', {
+            btn: ['确定','取消'] //按钮
+        }, function(){
+            $.post("{:url('flink/delete')}", {
+                fId:fId,
+            }, function (res) {
+                if (res.code > 0) {
+                    layer.msg(res.msg, {icon: 2});
+                } else {
+                    layer.msg(res.msg,{icon: 1});
+                    setTimeout(function (){window.location.reload();},1000);
+                }
+            }, 'json');
+        });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<aside class="col-md-3 sidebar">
+    {notempty name="username"}
+    <div class="widget about-blog text-center">
+        <div class="heading-lines">
+            <h3 class="widget-title heading">关于我</h3>
+        </div>
+        <img src="{$username['img']}" alt="">
+        <p class="mb-20 mt-30">{$username['message']}</p>
+    </div>
+    {/notempty}
+    <!-- Categories -->
+    <div class="widget categories">
+        <div class="heading-lines">
+            <h3 class="widget-title heading">分类</h3>
+        </div>
+        <ul class="list-dividers">
+            {volist name='cates' id='cv'}
+            <li>
+                <a href="{:url('category/index',['cid'=>$cv['id']])}">{$cv.name}</a><span>({$cv.count})</span>
+            </li>
+            {/volist}
+        </ul>
+    </div>
+
+    <!-- Ad banner -->
+    <div class="widget custom-ad-banner">
+        {volist name='slider' id='sv'}
+        <a href="{$sv.url}" target="_blank">
+            <img src="{$sv.img}" alt="{$sv.title}" class="mb-10">
+        </a>
+        {/volist}
+    </div>
+
+    <!-- Recent Posts -->
+    <div class="widget recent-posts">
+        <div class="heading-lines">
+            <h3 class="widget-title heading">最近发布</h3>
+        </div>
+        <div class="entry-list w-thumbs">
+            <ul class="posts-list list-dividers">
+                {volist name='rArticle' id='rv'}
+                <li class="entry-li">
+                    <article class="post-small clearfix">
+                        <div class="entry-img">
+                            <a href="{:url('single/index',['id'=>$rv['id']])}" target="_blank">
+                                <img src="{$rv.img}" width="100px" height="100px">
+                            </a>
+                        </div>
+                        <div class="entry">
+                            <h3 class="entry-title"><a href="{:url('single/index',['id'=>$rv['id']])}">{$rv.title}</a></h3>
+                            <ul class="entry-meta list-inline">
+                                <li class="entry-date">
+                                    <a href="#">{$rv.add_time |date='Y-m-d'}</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </article>
+                </li>
+                {/volist}
+            </ul>
+        </div>
+    </div>
+</aside>

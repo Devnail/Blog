@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>角色列表</title>
+    <link rel="stylesheet" type="text/css" href="__STATIC__/plugins/layui/css/layui.css">
+    <style>
+        .header span {
+            background-color: #009688;
+            margin-left: 30px;
+            padding: 10px;
+            color: #ffffff;
+        }
+        .header div {
+            border-bottom: solid 2px #009688;
+            margin-top: 8px;
+        }
+        .header button{
+            float: right;
+        }
+    </style>
+</head>
+<body>
+<div class="header" style="padding: 10px">
+    <span>角色列表</span>
+    <button class="layui-btn layui-btn-xs" onclick="add()">添加</button>
+    <div></div>
+</div>
+<table class="layui-table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>角色名称</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+    {volist name='rolesData' id='value'}
+        <tr>
+            <td>{$value.gid}</td>
+            <td>{$value.title}</td>
+            <td>
+                <button class="layui-btn-warm layui-btn layui-btn-xs" onclick="edit({$value.gid})">编辑</button>
+                <button class="layui-btn-danger layui-btn layui-btn-xs" onclick="del(this)" gid="{$value.gid}">删除</button>
+            </td>
+        </tr>
+    {/volist}
+    </tbody>
+</table>
+<script src="__STATIC__/plugins/layui/layui.js"></script>
+<script>
+    layui.use(['layer'],function (){
+        $=layui.jquery;
+        layer=layui.layer;
+    });
+    //添加
+    function add() {
+        layer.open({
+            type: 2,
+            title: '添加菜单',
+            shade: 0.3,
+            maxmin: true,
+            area: ['480px', '420px'],
+            content: "{:url('roles/add')}" //iframe的url
+        });
+    }
+    //编辑
+    function edit(gid) {
+        layer.open({
+            type: 2,
+            title: '编辑菜单',
+            shade: 0.3,
+            maxmin: true,
+            area: ['480px', '420px'],
+            content: '/public/admin/roles/edit?gid='+gid //iframe的url
+        });
+    }
+    //删除
+    function del(obj){
+        var gid=$(obj).attr('gid');
+        layer.confirm('确定要删除吗？', {
+            btn: ['确定','取消'] //按钮
+        }, function(){
+            $.post("{:url('roles/delete')}", {
+                gid:gid
+            }, function (res) {
+                if (res.code > 0) {
+                    layer.msg(res.msg, {icon: 2});
+                } else {
+                    layer.msg(res.msg,{icon: 1});
+                    setTimeout(function (){window.location.reload();},1000);
+                }
+            }, 'json');
+        });
+    }
+</script>
+</body>
+</html>

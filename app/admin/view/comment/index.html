@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>评论列表</title>
+    <link rel="stylesheet" type="text/css" href="__STATIC__/plugins/layui/css/layui.css">
+    <style>
+        .header span {
+            background-color: #009688;
+            margin-left: 30px;
+            padding: 10px;
+            color: #ffffff;
+        }
+
+        .header div {
+            border-bottom: solid 2px #009688;
+            margin-top: 8px;
+        }
+
+        .header button {
+            float: right;
+            margin-top: -5px;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="header" style="padding: 10px">
+    <span>评论列表</span>
+    <div></div>
+</div>
+<table class="layui-table">
+    <thead>
+    <tr parentId="0">
+        <th>伸缩</th>
+        <th>ID</th>
+        <th>用户名</th>
+        <th>文章标题</th>
+        <th>内容</th>
+        <th>状态</th>
+        <th>添加时间</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    {volist name='comment' id='cv'}
+    <tr id="{$cv.id}" parentId="{$cv.pid}">
+        <td style="text-align: center"><span class="open">+</span></td>
+        <td>{$cv.id}</td>
+        <td>{:str_repeat("-",$cv['level']);}{$cv.username}</td>
+        <td>{$cv.title}</td>
+        <td>{:mb_substr($cv['content'],0,20,'utf-8')}</td>
+        <td>{$cv.status===0?'正常':'<span style="color: red">禁用</span>'}</td>
+        <td>{$cv.add_time |date='Y-m-d H:i:s'}</td>
+        <td>
+            <button class="layui-btn layui-btn-xs" onclick="edit({$cv.id})">回复</button>
+            <button class="layui-btn layui-btn-xs layui-btn-danger" onclick="del(this)" commentId="{$cv.id}">删除</button>
+        </td>
+    </tr>
+    {/volist}
+    </tbody>
+</table>
+<script src="__STATIC__/plugins/layui/layui.js"></script>
+<script>
+    layui.use('layer', function () {
+        layer = layui.layer;
+        $=layui.jquery;
+        //列表伸展
+        $('tr[parentId!=0]').hide();
+        $('.open').click(function(){
+            var id=$(this).parents('tr').attr('id');
+            if($(this).text()==='+'){
+                $(this).text('-');
+                $('tr[parentId='+id+']').show();
+            }else{
+                $(this).text('+');
+                $('tr[parentId='+id+']').hide();
+            }
+        });
+    });
+    //编辑
+    function edit(id) {
+        layer.open({
+            type: 2,
+            title: '编辑评论',
+            shade: 0.3,
+            maxmin: true,
+            area: ['480px', '420px'],
+            content: "/public/admin/comment/edit?id="+id //iframe的url
+        });
+    }
+    //删除
+    function del(obj){
+        var commentId=$(obj).attr('commentId');
+        layer.confirm('确定要删除吗？', {
+            btn: ['确定','取消'] //按钮
+        }, function(){
+            $.post("{:url('comment/delete')}", {
+                commentId:commentId,
+            }, function (res) {
+                if (res.code > 0) {
+                    layer.alert(res.msg, {icon: 2});
+                } else {
+                    layer.alert(res.msg,{icon: 1});
+                    setTimeout(function (){window.location.reload();},1000);
+                }
+            }, 'json');
+        });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="__STATIC__/plugins/layui/css/layui.css">
+    <style>
+        .header span {
+            background-color: #009688;
+            margin-left: 30px;
+            padding: 10px;
+            color: #ffffff;
+        }
+
+        .header div {
+            border-bottom: solid 2px #009688;
+            margin-top: 8px;
+        }
+
+        .header button {
+            float: right;
+            margin-top: -5px;
+        }
+    </style>
+</head>
+<body>
+<div class="header" style="padding: 10px">
+    <span>文章列表</span>
+    <button class="layui-btn layui-btn-sm" onclick="add()">添加</button>
+    <div></div>
+</div>
+<table class="layui-table">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>标题</th>
+        <th>关键字</th>
+        <th>描述</th>
+        <th>所属分类</th>
+        <th>图片</th>
+        <th>添加时间</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    {volist name='articleList' id='value'}
+    <tr>
+        <td>{$value.id}</td>
+        <td>{$value.title}</td>
+        <td>{$value.keywords}</td>
+        <td>{$value.desc}</td>
+        <td>{$value.name}</td>
+        <td><img src="{$value.img}" style="height: 30px"></td>
+        <td>{$value.add_time |date='Y-m-d H:i:s'}</td>
+        <td>
+            <button class="layui-btn layui-btn-xs" onclick="edit({$value.id})">编辑</button>
+            <button class="layui-btn layui-btn-xs layui-btn-danger" onclick="del(this)" articleId="{$value.id}">删除</button>
+        </td>
+    </tr>
+    {/volist}
+    </tbody>
+</table>
+<div style="text-align: center">
+    {$articleList|raw}
+</div>
+<script src="__STATIC__/plugins/layui/layui.js"></script>
+<script>
+    layui.use('layer', function () {
+        layer = layui.layer;
+        $ = layui.jquery;
+    });
+
+    //添加
+    function add() {
+        layer.open({
+            type: 2,
+            title: '添加文章',
+            shade: 0.3,
+            maxmin: true,
+            area: ['800px', '600px'],
+            content: "{:url('article/add')}" //iframe的url
+        });
+    }
+    //编辑
+    function edit(id) {
+        layer.open({
+            type: 2,
+            title: '编辑文章',
+            shade: 0.3,
+            maxmin: true,
+            area: ['800px', '600px'],
+            content: "/public/admin/article/edit?id="+id //iframe的url
+        });
+    }
+    //删除
+    function del(obj){
+        var articleId=$(obj).attr('articleId');
+        layer.confirm('确定要删除吗？', {
+            btn: ['确定','取消'] //按钮
+        }, function(){
+            $.post("{:url('article/delete')}", {
+                articleId:articleId,
+            }, function (res) {
+                if (res.code > 0) {
+                    layer.msg(res.msg, {icon: 2});
+                } else {
+                    layer.msg(res.msg,{icon: 1});
+                    setTimeout(function (){window.location.reload();},1000);
+                }
+            }, 'json');
+        });
+    }
+</script>
+</body>
+</html>
